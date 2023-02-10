@@ -1,0 +1,69 @@
+<div *ngIf="!isLoading">
+  <div>
+    <div class="page-header mappings--header">
+      <div class="page-header--name mat-h2">
+        {{ getTitle(sourceField) | titlecase }} Mappings
+      </div>
+    </div>
+    <div class="page-info">
+      <div fxLayout="row" fxLayoutAlign="start center" class="page-info--description">
+        <span *ngIf="sourceField === 'corporate_card'">Map Corporate Credit Cards in Fyle to Bank accounts in Xero.</span>
+        <span *ngIf="sourceField !== 'corporate_card'">Map {{ getTitle(sourceField).toLowerCase() }} items from Fyle to their counterparts on Xero.</span>
+        <a href="{{helpDocLink}}" target="_blank" rel="noopener noreferrer" class="read-more-link" fxLayout="row" fxLayoutAlign="start center">Read more<mat-icon class="read-more-link--icon">open_in_new</mat-icon></a>
+      </div>
+      <button class="page-info--primary-action" mat-flat-button color="primary" type="button" (click)="open()">
+        New {{ getTitle(sourceField) | titlecase }} Mapping
+      </button>
+      <button class="secondary-button" mat-flat-button color="secondary" type="button" (click)="triggerAutoMapEmployees()" *ngIf="generalSettings.auto_map_employees && sourceField === 'employee'">
+        Refresh Employee Mappings
+      </button>
+
+      <mat-form-field class="simple-search" appearance="outline" *ngIf="count">
+        <mat-label>Search</mat-label>
+        <input matInput (keyup)="applyFilter($event)">
+        <span matPrefix>
+          <mat-icon class="simple-search--icon" aria-hidden="false" aria-label="Search">search </mat-icon>
+        </span>
+      </mat-form-field>
+      
+    </div>
+
+    <div *ngIf="!count && !isLoading">
+      <zero-state message="You have no {{ getTitle(sourceField).toLowerCase() }} mappings yet"></zero-state>
+    </div>
+
+    <div *ngIf="count && !mappings.filteredData.length && !isLoading">
+      <zero-state message="Looks like your search term doesn't match any of {{ getTitle(sourceField).charAt(0).toUpperCase() + getTitle(sourceField).slice(1) }} mappings"></zero-state>
+    </div>
+
+    <div *ngIf="count && mappings.filteredData.length" [hidden]="isLoading">
+      <table mat-table [dataSource]="mappings" class="page-table" matSort matSortActive="created_at"
+        matSortDisableClear matSortDirection="desc">
+        <ng-container matColumnDef="sourceField">
+          <th mat-header-cell *matHeaderCellDef> {{ getTitle(sourceField) | titlecase }} </th>
+          <td mat-cell *matCellDef="let element">
+            {{element.source.value}}
+            <mat-icon class="auto-map" [inline]="true" matTooltip="Auto mapped row from Fyle and Xero" matTooltipPosition="after" *ngIf="element.source.auto_mapped">bolt</mat-icon>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="destinationField">
+          <th mat-header-cell *matHeaderCellDef>
+            Xero {{ getTitle(setting.destination_field) | titlecase }}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{element.destination.value}}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" (click)="open(row)"></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-paginator *ngIf="count" [hidden]="!mappings.filteredData.length" [coloumnArray]="[]" (getMappings)="getMappings($event)" [pageNumber]="pageNumber" [count]="count" [isLoading]="isLoading"></app-paginator>
+<div class="internal-loader" fxLayoutAlign="center start" *ngIf="isLoading" fxFlexFill>
+  <app-loader></app-loader>
+</div>

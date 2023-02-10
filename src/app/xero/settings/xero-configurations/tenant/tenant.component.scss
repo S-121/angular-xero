@@ -1,0 +1,66 @@
+@import 'variables.scss';
+
+::ng-deep .general-mappings {
+  &--header {
+    border-bottom: 1px solid $fy-layout-background;
+  }
+
+  &--form {
+    font-size: 14px;
+    margin: 24px;
+    max-width: 360px;
+    color: $fy-nav-text;
+  }
+
+  &--input {
+    .mat-select-value-text {
+      color: $fy-nav-text;
+    }
+  }
+
+  &--save-btn {
+    max-width: 32px;
+  }
+}
+
+.status-icon {
+  position: absolute;
+  margin-left: 8px;
+  cursor: default;
+
+  &--connected {
+    color: green;
+  }
+
+  &--disconnected {
+    color: red;
+  }
+}
+
+.status {
+  color: #F2F6DA;
+  height: 30px;
+  line-height: 1px;
+  cursor: auto;
+
+  &--connected {
+    background-color: #019f01;
+  }
+
+  &--disconnected {
+    background-color: #C34427;
+  }
+}
+
+.xero-btn {
+  cursor: pointer;
+  padding-top: 20px;
+}
+
+.current-status {
+  padding: 5px;
+}
+
+.current-status-btn {
+  padding-left: 10px;
+}

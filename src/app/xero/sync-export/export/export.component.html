@@ -1,0 +1,61 @@
+<div class="internal-loader" fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading" fxFlexFill>
+    <app-loader></app-loader>
+  </div>
+  
+  <div *ngIf="!isLoading" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="export-header" fxLayout="row" fxLayoutAlign="start center">
+      Export Expenses to Xero. <a href="https://www.fylehq.com/help/en/articles/4601854-fyle-xero-integration" target="_blank" rel="noopener noreferrer" class="read-more-link" fxLayout="row" fxLayoutAlign="start center">Read more<mat-icon class="read-more-link--icon">open_in_new</mat-icon></a>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="start center">
+      <mat-card class="export-card">
+        <div fxLayout="column" fxLayoutAlign="start stretch">
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <div>
+              <div>
+                <div *ngIf="!isProcessingExports && !isExporting">
+                  {{exportableExpenseGroups.length}} expense group{{exportableExpenseGroups.length > 1 ? 's' : ''}} can be exported
+                </div>
+                <div *ngIf="!isProcessingExports && isExporting">
+                  {{exportedCount}} out of {{exportableExpenseGroups.length}} expense group{{exportableExpenseGroups.length > 1 ? 's' : ''}} are processed
+                </div>
+                <div *ngIf="isProcessingExports">
+                  {{processingExportsCount}} expense group{{processingExportsCount > 1 ? 's' : ''}} are still being exported, please wait for sometime
+                </div>
+              </div>
+            </div>
+            <div>
+              <button type="button" [disabled]="isExporting || isProcessingExports" mat-flat-button color="primary" (click)="createXeroItems()">
+                <div *ngIf="!isExporting && !isProcessingExports && exportableExpenseGroups && exportableExpenseGroups.length > 0">
+                  Export
+                </div>
+                <div *ngIf="isExporting || isProcessingExports">
+                  Exporting
+                </div>
+              </button>
+            </div>
+          </div>
+          <div class="export-card--loader" *ngIf="isExporting || isProcessingExports">
+            <mat-progress-bar mode="buffer"></mat-progress-bar>
+          </div>
+  
+          <div class="export-card--stats" fxLayout="row" fxLayoutAlign="start center" *ngIf="failedExpenseGroupCount">
+            <div>
+              {{failedExpenseGroupCount}} line <span *ngIf="failedExpenseGroupCount > 1">entries</span><span *ngIf="failedExpenseGroupCount === 1">entry</span> failed export
+            </div>
+            <mat-icon class="export-card--icon cursor-pointer" (click)="openFailedExports()">
+              open_in_new
+            </mat-icon>
+          </div>
+  
+          <div class="export-card--stats" fxLayout="row" fxLayoutAlign="start center" *ngIf="successfulExpenseGroupCount">
+            <div>
+              {{successfulExpenseGroupCount}} line <span *ngIf="successfulExpenseGroupCount > 1">entries</span><span *ngIf="successfulExpenseGroupCount === 1">entry</span> exported
+            </div>
+            <mat-icon class="export-card--icon cursor-pointer" (click)="openSuccessfulExports()">
+              open_in_new
+            </mat-icon>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>

@@ -1,0 +1,105 @@
+<h2 mat-dialog-title>
+  <div class="dialog--header" fxLayout="row" fxLayoutAlign="space-between center">
+    <div class="mat-title">
+      Configure Expense Groups
+    </div>
+    <div>
+      <mat-icon class="mappings-dialog--close cursor-pointer" aria-hidden="false" aria-label="close this dialog" mat-dialog-close>close</mat-icon>
+    </div>
+  </div>
+</h2>
+
+<mat-dialog-content>
+  <div class="internal-loader" fxLayoutAlign="center start" *ngIf="isLoading" fxFlexFill>
+    <app-loader></app-loader>
+  </div>
+  <form *ngIf="!isLoading" class="dialog--form" [formGroup]="importExpensesForm">
+      <div fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="dialog--label">
+          Group Expenses by:
+        </div>
+        <div>
+          <div class="dialog--group-label-left" *ngIf="showCCCGroups()">
+            Reimbursable Expenses
+          </div>
+          <div class="dialog--group-label-right" *ngIf="showCCCGroups()">
+            Credit Card Expenses
+          </div>
+        </div>
+
+        <div>
+          <mat-form-field floatLabel="always" appearance="outline" required [ngClass]="showCCCGroups() ? 'dialog--group-field-left' : 'dialog--group-field'">
+            <mat-select placeholder="Choose Expense fields to group Expenses" formControlName="reimbursableExpenseGroupConfiguration">
+              <mat-option *ngFor="let option of expenseGroupingFieldOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field floatLabel="always" class="dialog--group-field-right" appearance="outline" *ngIf="showCCCGroups()" required>
+            <mat-select placeholder="Choose Expense fields to group Expenses" formControlName="cccExpenseGroupConfiguration">
+              <mat-option *ngFor="let option of expenseGroupingFieldOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="dialog--label">
+          Date when Exporting Expenses to Xero:
+        </div>
+          <div>
+            <div class="dialog--group-label-left" *ngIf="showCCCGroups()">
+              Reimbursable Expenses
+            </div>
+            <div class="dialog--group-label-right" *ngIf="showCCCGroups()">
+              Credit Card Expenses
+            </div>
+          </div>
+    
+          <div>
+            <mat-form-field floatLabel="always" class="dialog--group-field-left" appearance="outline" [ngClass]="showCCCGroups() ? 'dialog--group-field-left' : 'dialog--group-field'">
+              <mat-select placeholder="Choose Date when Exporting Expenses" formControlName="reimbursableExportDate">
+                <mat-option *ngFor="let option of exportDateOptions" [value]="option.value">
+                  {{option.label}}
+                </mat-option>
+    
+              </mat-select>
+            </mat-form-field>
+    
+            <mat-form-field floatLabel="always" class="dialog--group-field-right" appearance="outline" *ngIf="showCCCGroups()">
+              <mat-select placeholder="Choose Date when Exporting Expenses" formControlName="cccExportDate">
+                <mat-option *ngFor="let option of exportDateOptions" [value]="option.value">
+                  {{option.label}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+        <div class="dialog--label">
+          Import Expenses in State:
+        </div>
+        <mat-form-field floatLabel="always" appearance="outline" required [ngClass]="showCCCGroups() ? 'dialog--group-field-left' : 'dialog--group-field'">
+          <mat-select placeholder="Choose State of Expenses to be fetched" formControlName="expenseState">
+            <mat-option value="PAYMENT_PROCESSING">
+              Payment Processing
+            </mat-option>
+            <mat-option value="PAID">
+              Paid
+            </mat-option>
+          </mat-select>
+          <mat-error class="dialog--error" *ngIf="importExpensesForm.controls.expenseState.errors?.required">
+            Please select atleast 1 state
+          </mat-error>
+        </mat-form-field>
+      </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <form *ngIf="!isLoading" class="dialog--form" [formGroup]="importExpensesForm">
+    <button type="button" mat-flat-button mat-dialog-close>Cancel</button>
+    <button class="dialog--save-btn" [disabled]='importExpensesForm.controls.expenseState.errors?.required' mat-flat-button color="primary" type="submit" (click)="save()">
+      Save
+    </button>
+  </form>
+</mat-dialog-actions>

@@ -1,0 +1,158 @@
+<div class="internal-loader" fxLayoutAlign="center start" *ngIf="isLoading" fxFlexFill>
+  <app-loader></app-loader>
+</div>
+<div class="configurations" *ngIf="!isLoading">
+  <div class="page-info">
+    <div fxLayout="row" fxLayoutAlign="start center" class="page-info--description">
+      <div>
+        Please map the following Fyle fields to their Xero equivalent.
+      </div>
+      <a href="https://www.fylehq.com/help/en/articles/4601898-onboarding-process-to-set-up-fyle-xero-integration" target="_blank" rel="noopener noreferrer" class="read-more-link" fxLayout="row" fxLayoutAlign="start center">Read more<mat-icon class="read-more-link--icon">open_in_new</mat-icon></a>
+    </div>
+  </div>
+  <form class="configurations--form" [formGroup]="generalSettingsForm">
+    <div fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="configurations--label">
+        Map reimbursable Expenses from Fyle to
+        <mandatory-field></mandatory-field>
+      </div>
+      <mat-form-field floatLabel="always" appearance="outline" required>
+        <mat-select placeholder="Choose Xero equivalent of Reimbursable Expenses"
+          formControlName="reimbursableExpense">
+          <mat-option [value]="'PURCHASE BILL'">
+            Purchase Bill
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mandatory-error-message listName="export type" *ngIf="generalSettingsForm.controls.reimbursableExpense.touched && !generalSettingsForm.controls.reimbursableExpense.valid"></mandatory-error-message>
+
+      <div class="configurations--label">
+        Map Corporate Credit Card Expenses from Fyle to
+      </div>
+      <mat-form-field floatLabel="always" appearance="outline">
+        <mat-select placeholder="Choose Xero equivalent of Corporate Credit Card Expenses"
+          formControlName="cccExpense">
+          <mat-option [value]="'BANK TRANSACTION'">
+            Bank Transaction
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="configurations--label">
+        Auto Map Employees from Fyle
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-form-field floatLabel="always" appearance="outline" fxFlex="100">
+          <mat-select placeholder="Choose how to auto map employees between Fyle and Xero"
+            formControlName="autoMapEmployees">
+            <mat-option>
+              None
+            </mat-option>
+            <mat-option [value]="'EMAIL'">
+              Match emails on Fyle and Xero
+            </mat-option>
+            <mat-option [value]="'NAME'">
+              Match names on Fyle and Xero
+            </mat-option>
+            <mat-option [value]="'EMPLOYEE_CODE'">
+              Match Fyle Employee Code to Xero Name
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="configurations--label">
+        Auto Sync Payments
+        <mat-icon [inline]="true" class="info-icon" matTooltip="Sync payments between Fyle and Xero" matTooltipPosition="after">info</mat-icon>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-form-field floatLabel="always" appearance="outline" fxFlex="100">
+          <mat-select placeholder="Choose Auto Sync Payments"
+            formControlName="paymentsSync">
+            <mat-option>
+              None
+            </mat-option>
+            <mat-option [value]="'sync_fyle_to_xero_payments'">
+              Export Fyle ACH Payments to Xero
+            </mat-option>
+            <mat-option [value]="'sync_xero_to_fyle_payments'">
+              Import Xero Payments into Fyle
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-slide-toggle color="primary" class="schedule" *ngIf="showAutoCreate" formControlName="autoCreateDestinationEntity">
+        <div class="schedule--toggle-text">Auto Create Contact on Xero
+          <mat-icon [inline]="true" class="info-icon" matTooltip="If an employee added in Fyle does not exist in Xero, Fyle will auto-create a contact in Xero for the employee." matTooltipPosition="after">info</mat-icon>
+        </div>
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" class="schedule" *ngIf="showAutoCreateMerchantDestinationEntity" formControlName="autoCreateMerchantDestinationEntity">
+        <div class="schedule--toggle-text">Auto Create Fyle Merchants as Contacts on Xero
+          <mat-icon [inline]="true" class="info-icon" matTooltip="While exporting corporate card expenses from Fyle, the integration will auto-create a contact in Xero if a merchant added in Fyle does not exist in Xero." matTooltipPosition="after">info</mat-icon>
+        </div>
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" class="schedule" formControlName="importCategories" (click)="showChartOfAccounts(!generalSettingsForm.value.importCategories)">
+        <div class="schedule--toggle-text">
+          Import Xero Chart of Accounts into Fyle
+          <mat-icon [inline]="true" class="info-icon" matTooltip="The selected accounts from Xero will be imported as categories in Fyle in an enabled state. These categories can be disabled if needed from Fyle Admin settings" matTooltipPosition="after">info</mat-icon>
+        </div>
+      </mat-slide-toggle>
+      
+      <div class="configurations--label" *ngIf="isChartOfAccountsEnabled">
+        Select Chart of Accounts to Import
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center" *ngIf="isChartOfAccountsEnabled">
+        <mat-form-field floatLabel="always" appearance="outline" fxFlex="100">
+          <mat-select placeholder="Choose Accounts You want to Import to Fyle"
+            formControlName="chartOfAccounts" multiple>
+            <mat-option *ngFor="let option of allAccountTypes" [disabled]="option.value === 'EXPENSE'" [value]="option.value">
+              {{option.label}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <mat-slide-toggle color="primary" class="schedule" *ngIf="xeroCompanyCountry !== 'US'" formControlName="importTaxCodes">
+        <div class="schedule--toggle-text">Import Xero Tax Codes to Fyle
+          <mat-icon
+            [inline]="true"
+            class="info-icon"
+            matTooltip="Import Tax Codes and Groups from Xero as Tax Groups in Fyle"
+            matTooltipPosition="after">
+              info
+          </mat-icon>
+        </div>
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" class="schedule" formControlName="importCustomers">
+        <div class="schedule--toggle-text">Import Xero Customers to Fyle
+          <mat-icon
+            [inline]="true"
+            class="info-icon"
+            matTooltip="Import Customers from Xero as Projects in Fyle"
+            matTooltipPosition="after">
+              info
+          </mat-icon>
+        </div>
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" class="schedule" formControlName="changeAccountingPeriod">
+        <div class="schedule--toggle-text">Export to next open period
+          <mat-icon
+            [inline]="true"
+            class="info-icon"
+            matTooltip="If the transaction date is earlier than the lock date, this setting will export the transaction with the date as the first of the current month."
+            matTooltipPosition="after">
+              info
+          </mat-icon>
+        </div>
+      </mat-slide-toggle>
+
+      <button [disabled]="!generalSettingsForm.valid" class="configurations--save-btn" mat-flat-button color="primary" (click)="save()" type="submit">
+        Save
+      </button>
+    </div>
+  </form>
+</div>
